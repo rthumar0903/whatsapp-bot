@@ -31,8 +31,10 @@ app.post("/webhook", (req, res) => {
 
   let body_param = req.body;
 
-  console.log(JSON.stringify(body_param, null, 2));
-  console.log("message", body_param);
+  // console.log(JSON.stringify(body_param, null, 2));
+  console.log("start  = = = = = = ", new Date().toISOString());
+  console.log("message = = = = = = ", body_param);
+  console.log("end = = = = = = ", new Date().toISOString());
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -71,7 +73,6 @@ app.post("/webhook", (req, res) => {
           "Content-Type": "application/json",
         },
       });
-
       res.sendStatus(200);
     } else {
       res.sendStatus(404);
