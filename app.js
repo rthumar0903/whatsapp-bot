@@ -1,12 +1,29 @@
 const express = require("express");
-const body_parser = require("body-parser");
-const axios = require("axios");
+var mysql = require("mysql");
 require("dotenv").config();
-
-const app = express().use(body_parser.json());
 
 const token = process.env.TOKEN;
 const mytoken = process.env.MYTOKEN;
+const db_host = process.env.DB_HOST;
+const db_user = process.env.DB_USER;
+const db_password = process.env.DB_PASSWORD;
+const db_name = process.env.DB_NAME;
+
+var con = mysql.createConnection({
+  host: db_host,
+  user: db_user,
+  password: db_password,
+  database: db_name,
+});
+con.connect(function (err) {
+  if (err) throw err;
+  console.log("Connected! Live DB");
+});
+
+const body_parser = require("body-parser");
+const axios = require("axios");
+
+const app = express().use(body_parser.json());
 
 app.listen(process.env.PORT, () => {
   console.log("webhook is listening");
@@ -32,12 +49,12 @@ app.post("/webhook", (req, res) => {
   let body_param = req.body;
 
   // console.log(JSON.stringify(body_param, null, 2));
-  console.log("start  = = = = = = ", new Date().toISOString());
-  console.log(
-    "message = = = = = = ",
-    body_param.entry[0].changes[0].value.messages
-  );
-  console.log("end = = = = = = ", new Date().toISOString());
+  // console.log("start  = = = = = = ", new Date().toISOString());
+  // console.log(
+  //   "message = = = = = = ",
+  //   body_param.entry[0].changes[0].value.messages
+  // );
+  // console.log("end = = = = = = ", new Date().toISOString());
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -88,7 +105,24 @@ app.post("/webhook", (req, res) => {
         body_param.entry[0].changes[0].value.messages[0].location["latitude"] &&
         body_param.entry[0].changes[0].value.messages[0].location["longitude"]
       ) {
-        console.log(body_param.entry[0].changes[0].value.messages[0]);
+        const phone_number =
+          body_param.entry[0].changes[0].value.messages[0].from;
+        const latitude =
+          body_param.entry[0].changes[0].value.messages[0].location.latitude;
+        const longitude =
+          body_param.entry[0].changes[0].value.messages[0].location.longitude;
+        console.log(
+          "query values = = = = = = ",
+          phone_number,
+          latitude,
+          longitude
+        );
+        const sql = `INSERT INTO users (name, phone_number,latitude,longitude) VALUES ('Raj',${phone_number},${latitude},${longitude})`;
+
+        con.query(sql, function (err, result) {
+          if (err) throw err;
+          console.log("1 record inserted", result);
+        });
       }
       res.sendStatus(200);
     } else {
