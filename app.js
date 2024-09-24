@@ -33,7 +33,10 @@ app.post("/webhook", (req, res) => {
 
   // console.log(JSON.stringify(body_param, null, 2));
   console.log("start  = = = = = = ", new Date().toISOString());
-  console.log("message = = = = = = ", body_param);
+  console.log(
+    "message = = = = = = ",
+    body_param.entry[0].changes[0].value.messages
+  );
   console.log("end = = = = = = ", new Date().toISOString());
   if (body_param.object) {
     if (
