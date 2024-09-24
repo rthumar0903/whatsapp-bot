@@ -48,34 +48,48 @@ app.post("/webhook", (req, res) => {
       let phon_no_id =
         body_param.entry[0].changes[0].value.metadata.phone_number_id;
       let from = body_param.entry[0].changes[0].value.messages[0].from;
-      // let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
 
-      axios({
-        method: "POST",
-        url:
-          "https://graph.facebook.com/v13.0/" +
-          phon_no_id +
-          "/messages?access_token=" +
-          token,
-        data: {
-          messaging_product: "whatsapp",
-          recipient_type: "individual",
-          type: "interactive",
-          to: from,
-          interactive: {
-            type: "location_request_message",
-            body: {
-              text: "Select your location",
-            },
-            action: {
-              name: "send_location",
+      if (
+        body_param.entry[0].changes[0].value.messages[0].text &&
+        body_param.entry[0].changes[0].value.messages[0].text.body &&
+        body_param.entry[0].changes[0].value.messages[0].text.body.toLowerCase() ==
+          "hi"
+      ) {
+        axios({
+          method: "POST",
+          url:
+            "https://graph.facebook.com/v13.0/" +
+            phon_no_id +
+            "/messages?access_token=" +
+            token,
+          data: {
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            type: "interactive",
+            to: from,
+            interactive: {
+              type: "location_request_message",
+              body: {
+                text: "Select your location",
+              },
+              action: {
+                name: "send_location",
+              },
             },
           },
-        },
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+
+      if (
+        body_param.entry[0].changes[0].value.messages[0].location &&
+        body_param.entry[0].changes[0].value.messages[0].location["latitude"] &&
+        body_param.entry[0].changes[0].value.messages[0].location["longitude"]
+      ) {
+        console.log(body_param.entry[0].changes[0].value.messages[0]);
+      }
       res.sendStatus(200);
     } else {
       res.sendStatus(404);
@@ -86,3 +100,17 @@ app.post("/webhook", (req, res) => {
 app.get("/", (req, res) => {
   res.status(200).send("hello this is webhook setup");
 });
+
+// [
+//   {
+//     context: {
+//       from: "15550988175",
+//       id: "wamid.HBgMOTE5Mjc3MjUwNzE2FQIAERgSMEJEOTVDOUM3NEQ4Mjk0RDg0AA==",
+//     },
+//     from: "919277250716",
+//     id: "wamid.HBgMOTE5Mjc3MjUwNzE2FQIAEhggQTkzQzVDRDRDQTZCQ0U1MTNCQzVCNEE1MjBFMjZDNDgA",
+//     timestamp: "1727198314",
+//     location: { latitude: 23.0122168, longitude: 72.5318272 },
+//     type: "location",
+//   },
+// ]
