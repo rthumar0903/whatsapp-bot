@@ -1,6 +1,9 @@
 const User = require("../models/users.model");
 const body_parser = require("body-parser");
 const axios = require("axios");
+const whatsAppConfig = require("../config/whatsapp.config.js");
+const token = whatsAppConfig.TOKEN;
+const mytoken = whatsAppConfig.MYTOKEN;
 
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
