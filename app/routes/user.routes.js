@@ -11,4 +11,6 @@ module.exports = (app) => {
 
   // Create a new User
   router.post("/webhook", user.senMessage);
+
+  app.use("/", router);
 };

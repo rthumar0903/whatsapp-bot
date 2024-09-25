@@ -20,7 +20,10 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = (req, res) => {
   let body_param = req.body;
-
+  console.log(
+    "========================",
+    body_param.entry[0].changes[0].value.messages[0].text.body
+  );
   if (body_param.object) {
     if (
       body_param.entry &&

@@ -25,6 +25,6 @@ require("./app/routes/user.routes.js")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
-app.listen(process.env.PORT, () => {
-  console.log("webhook is listening");
+app.listen(PORT, () => {
+  console.log("webhook is listening on ", PORT);
 });
