@@ -27,3 +27,21 @@ exports.insertRecord = (tableName, record) => {
     });
   });
 };
+
+exports.updateRecord = (tableName, record, columnName, columnValue) => {
+  return new Promise((resolve, reject) => {
+    const query = `UPDATE ? SET ? WHERE ? = ?`;
+
+    sql.query(
+      query,
+      [tableName, record, columnName, columnValue],
+      (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      }
+    );
+  });
+};

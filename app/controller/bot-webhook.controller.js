@@ -1,10 +1,15 @@
 const User = require("../models/users.model");
-const body_parser = require("body-parser");
-const axios = require("axios");
 const whatsAppConfig = require("../config/whatsapp.config.js");
-const token = whatsAppConfig.TOKEN;
+// const token = whatsAppConfig.TOKEN;
 const mytoken = whatsAppConfig.MYTOKEN;
-
+const sendLocationMessage = require("../services/meta.services.js");
+const userRoles = require("../constants/role.constants.js");
+const {
+  insertRecord,
+  checkRecordExists,
+  updateRecord,
+} = require("../models/utils/sqlFunction");
+const { json } = require("body-parser");
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
 };
@@ -22,12 +27,9 @@ exports.getMessage = (req, res) => {
   }
 };
 
-exports.senMessage = (req, res) => {
+exports.senMessage = async (req, res) => {
   let body_param = req.body;
-  // console.log(
-  //   "========================",
-  //   body_param.entry[0].changes[0].value?.contacts[0].profile
-  // );
+
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -35,10 +37,6 @@ exports.senMessage = (req, res) => {
       body_param.entry[0].changes[0].value.messages &&
       body_param.entry[0].changes[0].value.messages[0]
     ) {
-      let phon_no_id =
-        body_param.entry[0].changes[0].value.metadata.phone_number_id;
-      let from = body_param.entry[0].changes[0].value.messages[0].from;
-
       if (
         body_param.entry[0].changes[0].value.messages[0].text &&
         body_param.entry[0].changes[0].value.messages[0].text.body &&
@@ -47,11 +45,15 @@ exports.senMessage = (req, res) => {
       ) {
         const userName =
           body_param.entry[0].changes[0].value?.contacts[0]?.profile?.name;
-        const phone_number =
+        const phoneNumberId =
+          body_param.entry[0].changes[0].value.metadata.phone_number_id;
+        const phoneNumber =
           body_param.entry[0].changes[0].value.messages[0].from;
+
         const user = new User({
           name: userName,
-          phone_number: phone_number,
+          phone_number: phoneNumber,
+          role: userRoles.userRole.customer,
         });
         User.create(user, (err, data) => {
           if (err)
@@ -60,35 +62,10 @@ exports.senMessage = (req, res) => {
                 err.message ||
                 "Some error occurred while creating the Tutorial.",
             });
-          console.log("name and phone number inserted in Hi messa", data);
+          console.log("name and phone number inserted in Hi message", data);
         });
 
-        axios({
-          method: "POST",
-          url:
-            "https://graph.facebook.com/v13.0/" +
-            phon_no_id +
-            "/messages?access_token=" +
-            token,
-          data: {
-            messaging_product: "whatsapp",
-            recipient_type: "individual",
-            type: "interactive",
-            to: from,
-            interactive: {
-              type: "location_request_message",
-              body: {
-                text: `Hi ${userName}, Thank you for reaching out. Please help us with your location to help us connect you to our nearest pharmacy partner`,
-              },
-              action: {
-                name: "send_location",
-              },
-            },
-          },
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        await sendLocationMessage(phoneNumberId, userName, phoneNumber);
       }
 
       if (
@@ -96,31 +73,32 @@ exports.senMessage = (req, res) => {
         body_param.entry[0].changes[0].value.messages[0].location["latitude"] &&
         body_param.entry[0].changes[0].value.messages[0].location["longitude"]
       ) {
-        const phone_number =
+        const phoneNumber =
           body_param.entry[0].changes[0].value.messages[0].from;
         const latitude =
           body_param.entry[0].changes[0].value.messages[0].location.latitude;
         const longitude =
           body_param.entry[0].changes[0].value.messages[0].location.longitude;
-        console.log(
-          "query values = = = = = = ",
-          phone_number,
-          latitude,
-          longitude
-        );
-        const user = new User({
-          latitude: latitude,
-          longitude: longitude,
-        });
 
-        User.updateByPhone(phone_number, user, (err, data) => {
+        User.findByPhoneNumber(phoneNumber, async (err, data) => {
           if (err)
             res.status(500).send({
               message:
                 err.message ||
                 "Some error occurred while creating the Tutorial.",
             });
-          console.log("Updated User", data);
+          const customer = await checkRecordExists(
+            "customers",
+            "user_id",
+            data?.id
+          );
+          const customerUpdate = {
+            user_id: data?.id,
+            latitude,
+            longitude,
+          };
+          if (customer === null) insertRecord("customers", customerUpdate);
+          else updateRecord("customers", customerUpdate, "id", customer?.id);
         });
       }
       res.sendStatus(200);

@@ -4,9 +4,7 @@ const sql = require("./db.js");
 const User = function (user) {
   this.name = user.name;
   this.phone_number = user.phone_number;
-  this.pin_code = user.pin_code;
-  this.latitude = user.latitude;
-  this.longitude = user.longitude;
+  this.role = user.role;
 };
 
 User.create = (newUser, result) => {
@@ -20,6 +18,28 @@ User.create = (newUser, result) => {
     console.log("created user : ", { id: res.insertId, ...newUser });
     result(null, { id: res.insertId, ...newUser });
   });
+};
+
+User.findByPhoneNumber = (phoneNumber, result) => {
+  sql.query(
+    `SELECT * FROM users WHERE phone_number = ${phoneNumber}`,
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.length) {
+        console.log("found tutorial: ", res[0]);
+        result(null, res[0]);
+        return;
+      }
+
+      // not found Tutorial with the id
+      result({ kind: "not_found" }, null);
+    }
+  );
 };
 
 User.updateByPhone = (phone, user, result) => {
