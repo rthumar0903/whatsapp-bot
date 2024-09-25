@@ -21,3 +21,5 @@ User.create = (newUser, result) => {
     result(null, { id: res.insertId, ...newUser });
   });
 };
+
+module.exports = User;
