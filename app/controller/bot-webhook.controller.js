@@ -1,5 +1,6 @@
 const User = require("../models/users.model");
 const body_parser = require("body-parser");
+const axios = require("axios");
 
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
@@ -20,10 +21,7 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = (req, res) => {
   let body_param = req.body;
-  console.log(
-    "========================",
-    body_param.entry[0].changes[0].value.messages[0].text.body
-  );
+  console.log("========================", body_param.entry[0].changes[0].value);
   if (body_param.object) {
     if (
       body_param.entry &&
