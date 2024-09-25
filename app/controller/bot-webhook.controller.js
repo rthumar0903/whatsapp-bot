@@ -45,6 +45,8 @@ exports.senMessage = (req, res) => {
         body_param.entry[0].changes[0].value.messages[0].text.body.toLowerCase() ==
           "hi"
       ) {
+        const userName =
+          body_param.entry[0].changes[0].value?.contacts[0]?.profile?.name;
         axios({
           method: "POST",
           url:
@@ -60,7 +62,7 @@ exports.senMessage = (req, res) => {
             interactive: {
               type: "location_request_message",
               body: {
-                text: `Select your location`,
+                text: `Hi ${userName}, Thank you for reaching out. Please help us with your location to help us connect you to our nearest pharmacy partner`,
               },
               action: {
                 name: "send_location",
