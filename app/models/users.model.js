@@ -24,7 +24,7 @@ User.create = (newUser, result) => {
 
 User.updateByPhone = (phone, user, result) => {
   sql.query(
-    "UPDATE users SET name = ?,latitude = ?, longitude = ?, WHERE phone_number = ?",
+    "UPDATE users SET latitude = ?, longitude = ?, WHERE phone_number = ?",
     [user.name, user.latitude, user.longitude, phone],
     (err, res) => {
       if (err) {
