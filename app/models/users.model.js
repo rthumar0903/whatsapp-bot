@@ -3,7 +3,7 @@ const sql = require("./db.js");
 // constructor
 const User = function (user) {
   this.name = user.name;
-  this.phone_numner = user.phone_numner;
+  this.phone_number = user.phone_number;
   this.pin_code = user.pin_code;
   this.latitude = user.latitude;
   this.longitude = user.longitude;

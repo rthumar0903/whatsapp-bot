@@ -24,7 +24,10 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = (req, res) => {
   let body_param = req.body;
-  console.log("========================", body_param.entry[0].changes[0].value);
+  console.log(
+    "========================",
+    body_param.entry[0].changes[0].value?.contacts[0].profile
+  );
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -57,7 +60,7 @@ exports.senMessage = (req, res) => {
             interactive: {
               type: "location_request_message",
               body: {
-                text: "Select your location",
+                text: `Select your location`,
               },
               action: {
                 name: "send_location",
