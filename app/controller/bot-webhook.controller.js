@@ -24,10 +24,10 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = (req, res) => {
   let body_param = req.body;
-  console.log(
-    "========================",
-    body_param.entry[0].changes[0].value?.contacts[0].profile
-  );
+  // console.log(
+  //   "========================",
+  //   body_param.entry[0].changes[0].value?.contacts[0].profile
+  // );
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -47,6 +47,22 @@ exports.senMessage = (req, res) => {
       ) {
         const userName =
           body_param.entry[0].changes[0].value?.contacts[0]?.profile?.name;
+        const phone_number =
+          body_param.entry[0].changes[0].value.messages[0].from;
+        const user = new User({
+          name: userName,
+          phone_number: phone_number,
+        });
+        User.create(user, (err, data) => {
+          if (err)
+            res.status(500).send({
+              message:
+                err.message ||
+                "Some error occurred while creating the Tutorial.",
+            });
+          console.log("name and phone number inserted in Hi messa", data);
+        });
+
         axios({
           method: "POST",
           url:
@@ -93,20 +109,18 @@ exports.senMessage = (req, res) => {
           longitude
         );
         const user = new User({
-          name: "John",
-          phone_number: phone_number,
           latitude: latitude,
           longitude: longitude,
         });
 
-        User.create(user, (err, data) => {
+        User.updateByPhone(phone_number, user, (err, data) => {
           if (err)
             res.status(500).send({
               message:
                 err.message ||
                 "Some error occurred while creating the Tutorial.",
             });
-          console.log("1 record inserted", data);
+          console.log("Updated User", data);
         });
 
         // const sql = `INSERT INTO users (name, phone_number,latitude,longitude) VALUES ('Raj',${phone_number},${latitude},${longitude})`;

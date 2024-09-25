@@ -22,4 +22,26 @@ User.create = (newUser, result) => {
   });
 };
 
+User.updateByPhone = (phone, user, result) => {
+  sql.query(
+    "UPDATE users SET name = ?,latitude = ?, longitude = ?, WHERE phone_number = ?",
+    [user.name, user.latitude, user.longitude, phone],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log("updated User: ", { id: id, ...user });
+      result(null, { id: id, ...user });
+    }
+  );
+};
+
 module.exports = User;
