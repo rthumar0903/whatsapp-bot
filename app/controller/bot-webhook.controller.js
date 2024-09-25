@@ -122,13 +122,6 @@ exports.senMessage = (req, res) => {
             });
           console.log("Updated User", data);
         });
-
-        // const sql = `INSERT INTO users (name, phone_number,latitude,longitude) VALUES ('Raj',${phone_number},${latitude},${longitude})`;
-
-        // con.query(sql, function (err, result) {
-        //   if (err) throw err;
-        //   console.log("1 record inserted", result);
-        // });
       }
       res.sendStatus(200);
     } else {
