@@ -4,11 +4,7 @@ const token = whatsAppConfig.TOKEN;
 
 const axios = require("axios");
 
-module.exports = sendLocationMessage = async (
-  phonNoId,
-  userName,
-  phoneNumber
-) => {
+exports.sendLocationMessage = async (phonNoId, userName, phoneNumber) => {
   axios({
     method: "POST",
     url:
@@ -35,4 +31,58 @@ module.exports = sendLocationMessage = async (
       "Content-Type": "application/json",
     },
   });
+};
+
+exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
+  try {
+    axios({
+      method: "POST",
+      url:
+        "https://graph.facebook.com/v13.0/" +
+        phonNoId +
+        "/messages?access_token=" +
+        token,
+      data: {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        type: "text",
+        to: phoneNumber,
+        text: {
+          body: `Sorry, We are not present in your area yet. And plan to be there soon. Please download our app for future`,
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+
+exports.sendServicable = async (phonNoId, phoneNumber) => {
+  try {
+    axios({
+      method: "POST",
+      url:
+        "https://graph.facebook.com/v13.0/" +
+        phonNoId +
+        "/messages?access_token=" +
+        token,
+      data: {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        type: "text",
+        to: phoneNumber,
+        text: {
+          body: `Sorry, We are not present in your area yet. And plan to be there soon. Please download our app for future`,
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
 };

@@ -1,14 +1,19 @@
 const User = require("../models/users.model");
 const whatsAppConfig = require("../config/whatsapp.config.js");
-// const token = whatsAppConfig.TOKEN;
 const mytoken = whatsAppConfig.MYTOKEN;
-const sendLocationMessage = require("../services/meta.services.js");
+const {
+  sendLocationMessage,
+  sendNotServicableMessage,
+} = require("../services/meta.services.js");
 const userRoles = require("../constants/role.constants.js");
 const {
   insertRecord,
   checkRecordExists,
   updateRecord,
 } = require("../models/utils/sqlFunction");
+const MIN_DIST = whatsAppConfig.MIN_DIST;
+
+const { findMinShopDistance } = require("../services/distance.service.js");
 const { json } = require("body-parser");
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
@@ -79,6 +84,8 @@ exports.senMessage = async (req, res) => {
           body_param.entry[0].changes[0].value.messages[0].location.latitude;
         const longitude =
           body_param.entry[0].changes[0].value.messages[0].location.longitude;
+        const phoneNumberId =
+          body_param.entry[0].changes[0].value.metadata.phone_number_id;
 
         User.findByPhoneNumber(phoneNumber, async (err, data) => {
           if (err)
@@ -92,13 +99,40 @@ exports.senMessage = async (req, res) => {
             "user_id",
             data?.id
           );
-          const customerUpdate = {
-            user_id: data?.id,
-            latitude,
-            longitude,
-          };
-          if (customer === null) insertRecord("customers", customerUpdate);
-          else updateRecord("customers", customerUpdate, "id", customer?.id);
+          // let shop_dist = null;
+          // let shop_id = null;
+          findMinShopDistance(latitude, longitude, async (err, result) => {
+            if (err) {
+              console.error("Error:", err.message);
+            } else {
+              const shop_dist = result?.minDist || null;
+              const shop_id = result?.shopId || null;
+              if (customer === null) {
+                const customerAdd = {
+                  user_id: data?.id,
+                  latitude,
+                  longitude,
+                  shop_dist,
+                  shop_id,
+                };
+                insertRecord("customers", customerAdd);
+              } else {
+                const customerUpdate = {
+                  latitude,
+                  longitude,
+                  shop_dist,
+                  shop_id,
+                };
+                // console.log("update" , customerUpdate);
+                updateRecord("customers", customerUpdate, "id", customer?.id);
+              }
+              if (shop_dist > MIN_DIST) {
+                await sendNotServicableMessage(phoneNumberId, phoneNumber);
+              }
+            }
+          });
+
+          // console.log("min dist", minDist);
         });
       }
       res.sendStatus(200);

@@ -5,6 +5,7 @@ var connection = mysql.createPool({
   host: dbConfig.DB_HOST,
   user: dbConfig.DB_USER,
   password: dbConfig.DB_PASSWORD,
+  port: dbConfig.DB_PORT,
   database: dbConfig.DB_NAME,
 });
 
