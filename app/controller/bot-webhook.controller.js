@@ -11,6 +11,7 @@ const {
   checkRecordExists,
   updateRecord,
 } = require("../models/utils/sqlFunction");
+const { findCustomerAgent, insertOrder } = require("../models/order.model.js");
 const MIN_DIST = whatsAppConfig.MIN_DIST;
 
 const { findMinShopDistance } = require("../services/distance.service.js");
@@ -34,8 +35,9 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = async (req, res) => {
   let body_param = req.body;
-
-  if (body_param.object) {
+  if (body_param) {
+    // if (body_param.object) {
+    console.log("body = = =", body_param.entry[0]);
     if (
       body_param.entry &&
       body_param.entry[0].changes &&
@@ -139,9 +141,72 @@ exports.senMessage = async (req, res) => {
           // console.log("min dist", minDist);
         });
       }
+      console.log(
+        "=========",
+        JSON.stringify(body_param.entry[0].changes[0].value)
+      );
+      if (
+        body_param.entry[0].changes[0].value.messages[0].image &&
+        body_param.entry[0].changes[0].value.messages[0].image["id"]
+      ) {
+        const phoneNumber =
+          body_param.entry[0].changes[0].value.messages[0].from;
+        const phoneNumberId =
+          body_param.entry[0].changes[0].value.metadata.phone_number_id;
+
+        await findCustomerAgent(phoneNumber, async (err, data) => {
+          if (err)
+            res.status(500).send({
+              message:
+                err.message ||
+                "Some error occurred while creating the Tutorial.",
+            });
+          const order = {
+            customer_id: data?.[0]?.id,
+            agent_id: data?.[0]?.agent_id,
+            status: "accept",
+          };
+          console.log("order = = >", order);
+          await insertOrder(order, async (err, data) => {
+            if (err)
+              res.status(500).send({
+                message:
+                  err.message ||
+                  "Some error occurred while creating the Tutorial.",
+              });
+          });
+        });
+      }
       res.sendStatus(200);
     } else {
       res.sendStatus(404);
     }
   }
 };
+
+// [
+// {
+//   value: {
+//     messaging_product: "whatsapp",
+//     metadata: {
+//       display_phone_number: "15550988175",
+//       phone_number_id: "134794933052297",
+//     },
+//     contacts: [{ profile: { name: "Rt" }, wa_id: "919104382983" }],
+//     messages: [
+//       {
+//         from: "919104382983",
+//         id: "wamid.HBgMOTE5MTA0MzgyOTgzFQIAEhggNjZDNkU1QjU4MTE5MEE1Qjk5OUFDMDg1QjdFQjk3MjYA",
+//         timestamp: "1727374635",
+//         type: "image",
+//         image: {
+//           mime_type: "image/jpeg",
+//           sha256: "Tl5RqWgNrLyDyNwkhuPVRmqJKwgn6yiopTDvcti3ieU=",
+//           id: "447919264345274",
+//         },
+//       },
+//     ],
+//   },
+//   field: "messages",
+// },
+// ];
