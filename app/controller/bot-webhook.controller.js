@@ -42,6 +42,10 @@ exports.senMessage = async (req, res) => {
       body_param.entry[0].changes[0].value.messages &&
       body_param.entry[0].changes[0].value.messages[0]
     ) {
+      console.log(
+        "message = = = = ",
+        JSON.stringify(body_param.entry[0].changes)
+      );
       if (
         body_param.entry[0].changes[0].value.messages[0].text &&
         body_param.entry[0].changes[0].value.messages[0].text.body &&
