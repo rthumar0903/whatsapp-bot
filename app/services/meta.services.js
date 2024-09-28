@@ -62,6 +62,7 @@ exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
 
 exports.sendServicableMessage = async (phonNoId, phoneNumber) => {
   try {
+    console.log("phonme", phoneNumber);
     axios({
       method: "POST",
       url:

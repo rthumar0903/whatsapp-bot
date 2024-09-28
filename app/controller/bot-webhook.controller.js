@@ -120,6 +120,7 @@ exports.senMessage = async (req, res) => {
               const shop_dist = result?.minDist || null;
               const shop_id = result?.shopId || null;
               const address = await getAddressFromLatLong(latitude, longitude);
+              // console.log("addr - - - ", data?.data?.display_name);
               if (customer === null) {
                 const customerAdd = {
                   user_id: data?.id,
@@ -127,7 +128,7 @@ exports.senMessage = async (req, res) => {
                   longitude,
                   shop_dist,
                   shop_id,
-                  address: address?.display_name,
+                  address: address?.data?.display_name,
                 };
                 insertRecord("customers", customerAdd);
               } else {
@@ -136,14 +137,15 @@ exports.senMessage = async (req, res) => {
                   longitude,
                   shop_dist,
                   shop_id,
-                  address: address?.display_name,
+                  address: address?.data?.display_name,
                 };
                 updateRecord("customers", customerUpdate, "id", customer?.id);
               }
               if (shop_dist > MIN_DIST) {
                 await sendNotServicableMessage(phoneNumberId, phoneNumber);
               } else {
-                await sendServicableMessage(phoneNumber, phoneNumberId);
+                console.log("shop dist = = = ", shop_dist);
+                await sendServicableMessage(phoneNumberId, phoneNumber);
               }
             }
           });
