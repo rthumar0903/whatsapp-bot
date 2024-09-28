@@ -177,6 +177,7 @@ exports.senMessage = async (req, res) => {
           const customerId = data?.[0]?.id;
           const agentId = data?.[0]?.agent_id;
           const customerAddress = data?.[0]?.address;
+          const customerName = data?.[0]?.name;
           const order = {
             customer_id: customerId,
             agent_id: agentId,
@@ -203,32 +204,25 @@ exports.senMessage = async (req, res) => {
                 });
             });
           });
-          await User.findCustomerUser(customerId, async (err, data) => {
-            if (err)
-              res.status(500).send({
-                message:
-                  err.message ||
-                  "Some error occurred while creating the Tutorial.",
-              });
-            const agent = await checkRecordExists("agent", "id", agentId);
-            const agentUser = await checkRecordExists(
-              "users",
-              "id",
-              agent?.user_id
-            );
-            await sendMessageToAgent(
-              phoneNumberId,
-              agentUser?.phone_number,
-              data?.name,
-              phoneNumber,
-              customerAddress
-            );
-            await sendAttachmentMessageToAgent(
-              phoneNumberId,
-              agentUser?.phone_number,
-              imageId
-            );
-          });
+
+          const agent = await checkRecordExists("agent", "id", agentId);
+          const agentUser = await checkRecordExists(
+            "users",
+            "id",
+            agent?.user_id
+          );
+          await sendMessageToAgent(
+            phoneNumberId,
+            agentUser?.phone_number,
+            customerName,
+            phoneNumber,
+            customerAddress
+          );
+          await sendAttachmentMessageToAgent(
+            phoneNumberId,
+            agentUser?.phone_number,
+            imageId
+          );
         });
       }
       res.sendStatus(200);
