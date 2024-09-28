@@ -48,7 +48,7 @@ exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
         type: "text",
         to: phoneNumber,
         text: {
-          body: `Sorry, We are not present in your area yet. And plan to be there soon. Please download our app for future`,
+          body: `Sorry, \nWe are not present in your area yet. And plan to be there soon. Please download our app for future`,
         },
       },
       headers: {
@@ -60,7 +60,7 @@ exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
   }
 };
 
-exports.sendServicable = async (phonNoId, phoneNumber) => {
+exports.sendServicableMessage = async (phonNoId, phoneNumber) => {
   try {
     axios({
       method: "POST",
@@ -75,7 +75,92 @@ exports.sendServicable = async (phonNoId, phoneNumber) => {
         type: "text",
         to: phoneNumber,
         text: {
-          body: `Sorry, We are not present in your area yet. And plan to be there soon. Please download our app for future`,
+          body: `Hi, We service your location. You can now order medicines and get delivered in 10 minutes. You can also visit our nearest shop to collect your medicines google_map_link. Upload your prescription or connect with agent`,
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+
+exports.getUploadAttachmentUrl = async (imageId) => {
+  try {
+    const response = await axios({
+      method: "GET",
+      url:
+        "https://graph.facebook.com/v18.0/" +
+        imageId +
+        "?access_token=" +
+        token,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response?.data?.url) return response?.data?.url;
+    return null;
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+
+exports.sendMessageToAgent = async (
+  phonNoId,
+  phoneNumber,
+  customerName,
+  customerNumber,
+  address
+) => {
+  try {
+    axios({
+      method: "POST",
+      url:
+        "https://graph.facebook.com/v13.0/" +
+        phonNoId +
+        "/messages?access_token=" +
+        token,
+      data: {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        type: "text",
+        to: phoneNumber,
+
+        text: {
+          body: `Hi. You have a new request.\nCustomer Name : ${customerName}\nCustomer Number:${customerNumber}\nAddress:${address}`,
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+
+exports.sendAttachmentMessageToAgent = async (
+  phonNoId,
+  phoneNumber,
+  imageId
+) => {
+  try {
+    axios({
+      method: "POST",
+      url:
+        "https://graph.facebook.com/v13.0/" +
+        phonNoId +
+        "/messages?access_token=" +
+        token,
+      data: {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        type: "image",
+        to: phoneNumber,
+        image: {
+          id: imageId,
         },
       },
       headers: {

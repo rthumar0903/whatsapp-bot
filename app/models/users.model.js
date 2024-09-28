@@ -64,4 +64,16 @@ User.updateByPhone = (phone, user, result) => {
   );
 };
 
+User.findCustomerUser = (customerId, result) => {
+  const query = `SELECT users.name, users.phone_number, users.role FROM customers JOIN users ON customers.user_id = users.id WHERE customers.id =?`;
+  sql.query(query, [customerId], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};
+
 module.exports = User;

@@ -4,7 +4,12 @@ const mytoken = whatsAppConfig.MYTOKEN;
 const {
   sendLocationMessage,
   sendNotServicableMessage,
+  sendServicableMessage,
+  getUploadAttachmentUrl,
+  sendMessageToAgent,
+  sendAttachmentMessageToAgent,
 } = require("../services/meta.services.js");
+const { findMinShopDistance } = require("../services/distance.service.js");
 const userRoles = require("../constants/role.constants.js");
 const {
   insertRecord,
@@ -12,9 +17,10 @@ const {
   updateRecord,
 } = require("../models/utils/sqlFunction");
 const { findCustomerAgent, insertOrder } = require("../models/order.model.js");
+const { insertFile } = require("../models/file.model.js");
 const MIN_DIST = whatsAppConfig.MIN_DIST;
 
-const { findMinShopDistance } = require("../services/distance.service.js");
+const { getAddressFromLatLong } = require("../services/address.service.js");
 const { json } = require("body-parser");
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
@@ -113,6 +119,7 @@ exports.senMessage = async (req, res) => {
             } else {
               const shop_dist = result?.minDist || null;
               const shop_id = result?.shopId || null;
+              const address = await getAddressFromLatLong(latitude, longitude);
               if (customer === null) {
                 const customerAdd = {
                   user_id: data?.id,
@@ -120,6 +127,7 @@ exports.senMessage = async (req, res) => {
                   longitude,
                   shop_dist,
                   shop_id,
+                  address: address?.display_name,
                 };
                 insertRecord("customers", customerAdd);
               } else {
@@ -128,23 +136,19 @@ exports.senMessage = async (req, res) => {
                   longitude,
                   shop_dist,
                   shop_id,
+                  address: address?.display_name,
                 };
-                // console.log("update" , customerUpdate);
                 updateRecord("customers", customerUpdate, "id", customer?.id);
               }
               if (shop_dist > MIN_DIST) {
                 await sendNotServicableMessage(phoneNumberId, phoneNumber);
+              } else {
+                await sendServicableMessage(phoneNumber, phoneNumberId);
               }
             }
           });
-
-          // console.log("min dist", minDist);
         });
       }
-      console.log(
-        "=========",
-        JSON.stringify(body_param.entry[0].changes[0].value)
-      );
       if (
         body_param.entry[0].changes[0].value.messages[0].image &&
         body_param.entry[0].changes[0].value.messages[0].image["id"]
@@ -153,7 +157,8 @@ exports.senMessage = async (req, res) => {
           body_param.entry[0].changes[0].value.messages[0].from;
         const phoneNumberId =
           body_param.entry[0].changes[0].value.metadata.phone_number_id;
-
+        const imageId =
+          body_param.entry[0].changes[0].value.messages[0].image["id"];
         await findCustomerAgent(phoneNumber, async (err, data) => {
           if (err)
             res.status(500).send({
@@ -161,12 +166,14 @@ exports.senMessage = async (req, res) => {
                 err.message ||
                 "Some error occurred while creating the Tutorial.",
             });
+          const customerId = data?.[0]?.id;
+          const agentId = data?.[0]?.agent_id;
+          const customerAddress = data?.[0]?.address;
           const order = {
-            customer_id: data?.[0]?.id,
-            agent_id: data?.[0]?.agent_id,
+            customer_id: customerId,
+            agent_id: agentId,
             status: "accept",
           };
-          console.log("order = = >", order);
           await insertOrder(order, async (err, data) => {
             if (err)
               res.status(500).send({
@@ -174,6 +181,45 @@ exports.senMessage = async (req, res) => {
                   err.message ||
                   "Some error occurred while creating the Tutorial.",
               });
+            const file = {
+              order_id: data?.id,
+              created_at: new Date(),
+              media_id: imageId,
+            };
+            await insertFile(file, async (err, data) => {
+              if (err)
+                res.status(500).send({
+                  message:
+                    err.message ||
+                    "Some error occurred while creating the Tutorial.",
+                });
+            });
+          });
+          await User.findCustomerUser(customerId, async (err, data) => {
+            if (err)
+              res.status(500).send({
+                message:
+                  err.message ||
+                  "Some error occurred while creating the Tutorial.",
+              });
+            const agent = await checkRecordExists("agent", "id", agentId);
+            const agentUser = await checkRecordExists(
+              "users",
+              "id",
+              agent?.user_id
+            );
+            await sendMessageToAgent(
+              phoneNumberId,
+              agentUser?.phone_number,
+              data?.name,
+              phoneNumber,
+              customerAddress
+            );
+            await sendAttachmentMessageToAgent(
+              phoneNumberId,
+              agentUser?.phone_number,
+              imageId
+            );
           });
         });
       }
@@ -183,30 +229,3 @@ exports.senMessage = async (req, res) => {
     }
   }
 };
-
-// [
-// {
-//   value: {
-//     messaging_product: "whatsapp",
-//     metadata: {
-//       display_phone_number: "15550988175",
-//       phone_number_id: "134794933052297",
-//     },
-//     contacts: [{ profile: { name: "Rt" }, wa_id: "919104382983" }],
-//     messages: [
-//       {
-//         from: "919104382983",
-//         id: "wamid.HBgMOTE5MTA0MzgyOTgzFQIAEhggNjZDNkU1QjU4MTE5MEE1Qjk5OUFDMDg1QjdFQjk3MjYA",
-//         timestamp: "1727374635",
-//         type: "image",
-//         image: {
-//           mime_type: "image/jpeg",
-//           sha256: "Tl5RqWgNrLyDyNwkhuPVRmqJKwgn6yiopTDvcti3ieU=",
-//           id: "447919264345274",
-//         },
-//       },
-//     ],
-//   },
-//   field: "messages",
-// },
-// ];
