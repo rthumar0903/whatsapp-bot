@@ -64,7 +64,7 @@ exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
   }
 };
 
-exports.sendServicableMessage = async (phonNoId, phoneNumber) => {
+exports.sendServicableMessage = async (phonNoId, phoneNumber, agentDetails) => {
   try {
     console.log("phonme", phoneNumber);
     axios({
@@ -80,7 +80,7 @@ exports.sendServicableMessage = async (phonNoId, phoneNumber) => {
         type: "text",
         to: phoneNumber,
         text: {
-          body: `Hi, We service your location. You can now order medicines and get delivered in 10 minutes. You can also visit our nearest shop to collect your medicines google_map_link. Upload your prescription or connect with agent`,
+          body: `Hi, We service your location. You can now order medicines and get delivered in 10 minutes. You can also visit our nearest shop to collect your medicines google_map_link. Upload your prescription or connect with agent.\n Agent Details\nAgent Name : ${agentDetails?.name}\nAgent Phone Number : ${agentDetails?.phone_number}`,
         },
       },
       headers: {

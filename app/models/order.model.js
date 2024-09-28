@@ -36,3 +36,15 @@ exports.insertOrder = (order, result) => {
     result(null, { id: res.insertId, ...order });
   });
 };
+
+exports.findAgentDetails = (shopId, result) => {
+  const query = `SELECT users.id, users.name, users.phone_number FROM shops JOIN agent ON shops.agent_id = agent.id JOIN users ON agent.user_id = users.id WHERE shops.id = ?`;
+  sql.query(query, [shopId], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};

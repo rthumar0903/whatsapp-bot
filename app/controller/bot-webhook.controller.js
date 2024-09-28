@@ -16,7 +16,11 @@ const {
   checkRecordExists,
   updateRecord,
 } = require("../models/utils/sqlFunction");
-const { findCustomerAgent, insertOrder } = require("../models/order.model.js");
+const {
+  findCustomerAgent,
+  findAgentDetails,
+  insertOrder,
+} = require("../models/order.model.js");
 const { insertFile } = require("../models/file.model.js");
 const MIN_DIST = whatsAppConfig.MIN_DIST;
 
@@ -147,12 +151,24 @@ exports.senMessage = async (req, res) => {
                 };
                 updateRecord("customers", customerUpdate, "id", customer?.id);
               }
-              if (shop_dist > MIN_DIST) {
-                await sendNotServicableMessage(phoneNumberId, phoneNumber);
-              } else {
-                console.log("shop dist = = = ", shop_dist);
-                await sendServicableMessage(phoneNumberId, phoneNumber);
-              }
+              await findAgentDetails(shop_id, async (err, data) => {
+                if (err)
+                  res.status(500).send({
+                    message:
+                      err.message ||
+                      "Some error occurred while creating the Tutorial.",
+                  });
+                console.log("agent details", data);
+                if (shop_dist > MIN_DIST) {
+                  await sendNotServicableMessage(phoneNumberId, phoneNumber);
+                } else {
+                  await sendServicableMessage(
+                    phoneNumberId,
+                    phoneNumber,
+                    data[0]
+                  );
+                }
+              });
             }
           });
         });
