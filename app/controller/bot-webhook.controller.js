@@ -72,15 +72,21 @@ exports.senMessage = async (req, res) => {
           phone_number: phoneNumber,
           role: userRoles.userRole.customer,
         });
-        User.create(user, (err, data) => {
-          if (err)
-            res.status(500).send({
-              message:
-                err.message ||
-                "Some error occurred while creating the Tutorial.",
-            });
-          console.log("name and phone number inserted in Hi message", data);
-        });
+        const userExist = await checkRecordExists(
+          "users",
+          "phone_number",
+          phoneNumber
+        );
+        if (userExist === null)
+          User.create(user, (err, data) => {
+            if (err)
+              res.status(500).send({
+                message:
+                  err.message ||
+                  "Some error occurred while creating the Tutorial.",
+              });
+            console.log("name and phone number inserted in Hi message", data);
+          });
 
         await sendLocationMessage(phoneNumberId, userName, phoneNumber);
       }
