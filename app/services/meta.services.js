@@ -152,6 +152,12 @@ exports.sendAttachmentMessageToAgent = async (
   imageId
 ) => {
   try {
+    console.log(
+      "88888888888888888888888888888888888888888888888888888",
+      phonNoId,
+      phoneNumber,
+      imageId
+    );
     axios({
       method: "POST",
       url:
