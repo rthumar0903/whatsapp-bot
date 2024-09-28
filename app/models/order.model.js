@@ -26,7 +26,7 @@ exports.findCustomerAgent = (phoneNumber, result) => {
 };
 
 exports.insertOrder = (order, result) => {
-  order.id = uuidv4();
+  // order.id = uuidv4();
   sql.query("INSERT INTO orders SET ?", order, (err, res) => {
     if (err) {
       console.log("error: ", err);
