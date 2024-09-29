@@ -45,19 +45,14 @@ exports.getMessage = (req, res) => {
 
 exports.senMessage = async (req, res) => {
   let body_param = req.body;
-  if (body_param) {
-    // if (body_param.object) {
-    console.log("body = = =", body_param.entry[0]);
+  // if (body_param) {
+  if (body_param.object) {
     if (
       body_param.entry &&
       body_param.entry[0].changes &&
       body_param.entry[0].changes[0].value.messages &&
       body_param.entry[0].changes[0].value.messages[0]
     ) {
-      console.log(
-        "message = = = = ",
-        JSON.stringify(body_param.entry[0].changes)
-      );
       if (
         body_param.entry[0].changes[0].value.messages[0].text &&
         body_param.entry[0].changes[0].value.messages[0].text.body &&
@@ -158,7 +153,6 @@ exports.senMessage = async (req, res) => {
                       err.message ||
                       "Some error occurred while creating the Tutorial.",
                   });
-                console.log("agent details", data);
                 if (shop_dist > MIN_DIST) {
                   await sendNotServicableMessage(phoneNumberId, phoneNumber);
                 } else {

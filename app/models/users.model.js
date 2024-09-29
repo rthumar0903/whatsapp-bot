@@ -31,7 +31,6 @@ User.findByPhoneNumber = (phoneNumber, result) => {
       }
 
       if (res.length) {
-        console.log("found tutorial: ", res[0]);
         result(null, res[0]);
         return;
       }
@@ -65,7 +64,7 @@ User.updateByPhone = (phone, user, result) => {
 };
 
 User.findCustomerUser = (customerId, result) => {
-  const query = `SELECT users.name, users.phone_number, users.role FROM customers JOIN users ON customers.user_id = users.id WHERE customers.id =?`;
+  const query = `SELECT u.name, u.phone_number, u.role,c.latitude,c.longitude,c.address FROM customers as c JOIN users as u ON c.user_id = u.id WHERE u.id =?`;
   sql.query(query, [customerId], (err, res) => {
     if (err) {
       console.log("error: ", err);

@@ -1,5 +1,6 @@
 const whatsAppConfig = require("../config/whatsapp.config.js");
 const token = whatsAppConfig.TOKEN;
+const phonNoId = whatsAppConfig.PHONE_ID;
 // const mytoken = whatsAppConfig.MYTOKEN;
 
 const axios = require("axios");
@@ -152,12 +153,6 @@ exports.sendAttachmentMessageToAgent = async (
   imageId
 ) => {
   try {
-    console.log(
-      "88888888888888888888888888888888888888888888888888888",
-      phonNoId,
-      phoneNumber,
-      imageId
-    );
     axios({
       method: "POST",
       url:
@@ -172,6 +167,34 @@ exports.sendAttachmentMessageToAgent = async (
         to: phoneNumber,
         image: {
           id: imageId,
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+
+exports.sendOtp = async (otp, phoneNumber) => {
+  try {
+    axios({
+      method: "POST",
+      url:
+        "https://graph.facebook.com/v13.0/" +
+        phonNoId +
+        "/messages?access_token=" +
+        token,
+      data: {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        type: "text",
+        to: phoneNumber,
+
+        text: {
+          body: `Your verification otp is ${otp}`,
         },
       },
       headers: {

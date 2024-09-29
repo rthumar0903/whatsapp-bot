@@ -5,6 +5,7 @@ const {
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { login, sendteOtpService } = require("../services/auth.service");
 
 exports.register = async (req, res) => {
   const { email, password } = req.body;
@@ -38,41 +39,27 @@ exports.register = async (req, res) => {
 const generateAccessToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res
-      .status(400)
-      .json({ error: "Email or Password fields cannot be empty!" });
-    return;
+
+exports.sendOtp = async (req, res) => {
+  console.log("come");
+
+  const { phoneNumber } = req.body;
+  try {
+    await sendteOtpService(phoneNumber);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
+};
+
+exports.login = async (req, res) => {
+  const { phoneNumber, otp } = req.body;
 
   try {
-    const existingUser = await checkRecordExists("users", "email", email);
-
-    if (existingUser) {
-      if (!existingUser.password) {
-        res.status(401).json({ error: "Invalid credentials" });
-        return;
-      }
-
-      const passwordMatch = await bcrypt.compare(
-        password,
-        existingUser.password
-      );
-
-      if (passwordMatch) {
-        res.status(200).json({
-          userId: existingUser.id,
-          email: existingUser.email,
-          access_token: generateAccessToken(existingUser.id),
-        });
-      } else {
-        res.status(401).json({ error: "Invalid credentials" });
-      }
-    } else {
-      res.status(401).json({ error: "Invalid credentials" });
-    }
+    const isAuthorize = await login(phoneNumber, otp);
+    const user = await checkRecordExists("users", "phone_number", phoneNumber);
+    if (isAuthorize) res.status(200).json({ data: user });
+    else res.sendStatus(403);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

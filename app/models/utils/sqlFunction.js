@@ -39,7 +39,6 @@ exports.updateRecord = (tableName, record, columnName, columnValue) => {
           console.log(err);
           reject(err);
         } else {
-          console.log(results);
           resolve(results);
         }
       }

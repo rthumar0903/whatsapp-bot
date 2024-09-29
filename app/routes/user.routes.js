@@ -1,16 +1,15 @@
 module.exports = (app) => {
   const user = require("../controller/bot-webhook.controller");
-
+  const customer = require("../controller/customer.controller");
   var router = require("express").Router();
 
-  // setup web
   router.get("/", user.webHookSetUp);
 
-  // connect webhook User
   router.get("/webhook", user.getMessage);
 
-  // Create a new User
   router.post("/webhook", user.senMessage);
+
+  router.get("/customers/:id", customer.getCustomerDetails);
 
   app.use("/", router);
 };
