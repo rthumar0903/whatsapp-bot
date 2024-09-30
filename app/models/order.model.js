@@ -48,3 +48,15 @@ exports.findAgentDetails = (shopId, result) => {
     result(null, res);
   });
 };
+
+exports.getOrders = (agentId, result) => {
+  const query = `SELECT * from orders JOIN files ON orders.id=files.order_id JOIN customers ON orders.customer_id = customers.id JOIN users ON customers.user_id= users.id WHERE orders.agent_id = ?`;
+  sql.query(query, [agentId], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};

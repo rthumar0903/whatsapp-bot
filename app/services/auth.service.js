@@ -15,6 +15,7 @@ exports.sendteOtpService = async (phoneNumber) => {
       digits: true,
       lowerCaseAlphabets: false,
     });
+    console.log("otp", phoneNumber);
     await sendOtp(otp, phoneNumber);
     const existOtp = await checkRecordExists(
       "otp",
