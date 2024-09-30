@@ -45,3 +45,18 @@ exports.updateRecord = (tableName, record, columnName, columnValue) => {
     );
   });
 };
+
+exports.getRecords = (tableName) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM ${tableName}`;
+
+    sql.query(query, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.log("shops", results);
+        resolve(results.length ? results : null);
+      }
+    });
+  });
+};

@@ -11,5 +11,7 @@ module.exports = (app) => {
 
   router.get("/customers/:id", customer.getCustomerDetails);
 
+  router.get("/customers", customer.getCustomers);
+
   app.use("/", router);
 };

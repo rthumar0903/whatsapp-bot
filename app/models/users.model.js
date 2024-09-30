@@ -75,4 +75,16 @@ User.findCustomerUser = (customerId, result) => {
   });
 };
 
+User.findCustomers = (role, result) => {
+  const query = `SELECT u.name, u.phone_number, u.role,c.pincode,c.latitude,c.longitude,c.address FROM customers as c JOIN users as u ON c.user_id = u.id WHERE u.role =?`;
+  sql.query(query, [role], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};
+
 module.exports = User;
