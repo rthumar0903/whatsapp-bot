@@ -11,3 +11,15 @@ exports.findAgentsDetails = (result) => {
     result(null, res);
   });
 };
+
+exports.addAgent = (agent, result) => {
+  const query = `insert into agent SET ?`;
+  sql.query(query, agent, (err, res) => {
+    if (err) {
+      console.error(err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};
