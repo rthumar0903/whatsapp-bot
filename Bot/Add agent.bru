@@ -5,7 +5,14 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/agent
-  body: none
+  url: http://localhost:8000/agents
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "name":"Zeel",
+    "phoneNumber":"9978901114"
+  }
 }

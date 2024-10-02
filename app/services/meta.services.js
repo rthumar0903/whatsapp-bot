@@ -78,10 +78,24 @@ exports.sendServicableMessage = async (phonNoId, phoneNumber, agentDetails) => {
       data: {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        type: "text",
+        type: "interactive",
         to: phoneNumber,
-        text: {
-          body: `Hi, We service your location. You can now order medicines and get delivered in 10 minutes. You can also visit our nearest shop to collect your medicines google_map_link. Upload your prescription or connect with agent.\n Agent Details\nAgent Name : ${agentDetails?.name}\nAgent Phone Number : ${agentDetails?.phone_number}`,
+        interactive: {
+          type: "button",
+          body: {
+            text: `Hi, We service your location. You can now order medicines and get delivered in 10 minutes. You can also visit our nearest shop to collect your medicines google_map_link. Upload your prescription or connect with agent.\n Agent Details\nAgent Name : ${agentDetails?.name}\nAgent Phone Number : ${agentDetails?.phone_number}`,
+          },
+          action: {
+            buttons: [
+              {
+                type: "reply",
+                reply: {
+                  id: "reply_for_option_1", // Reply message ID
+                  title: "Connect with Agent", // Button label
+                },
+              },
+            ],
+          },
         },
       },
       headers: {
