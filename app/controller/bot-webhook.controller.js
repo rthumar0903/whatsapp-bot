@@ -93,9 +93,10 @@ exports.senMessage = async (req, res) => {
         await sendLocationMessage(phoneNumberId, userName, phoneNumber);
       }
       if (
-        body_param.entry[0].changes[0].value.messages[0].text &&
-        body_param.entry[0].changes[0].value.messages[0].text.body &&
-        body_param.entry[0].changes[0].value.messages[0].text.body.toLowerCase() ==
+        body_param.entry[0].changes[0].value.messages[0]?.interactive &&
+        body_param.entry[0].changes[0].value.messages[0]?.interactive
+          ?.button_reply &&
+        body_param.entry[0].changes[0].value.messages[0]?.interactive?.button_reply?.title?.toLowerCase() ===
           "Connect with Agent"
       ) {
         const userName =
