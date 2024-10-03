@@ -245,7 +245,14 @@ exports.senMessage = async (req, res) => {
             "id",
             agent?.user_id
           );
-          console.log(" - - - - - - -agent users", agentUser);
+          console.log(
+            "agent log - - -  -- - - - - - -",
+            phoneNumberId,
+            agentUser?.phone_number,
+            customerName,
+            phoneNumber,
+            customerAddress
+          );
           await sendMessageToAgent(
             phoneNumberId,
             agentUser?.phone_number,
@@ -253,6 +260,7 @@ exports.senMessage = async (req, res) => {
             phoneNumber,
             customerAddress
           );
+          console.log("sended = = =  = = =");
           await sendAttachmentMessageToAgent(
             phoneNumberId,
             agentUser?.phone_number,
