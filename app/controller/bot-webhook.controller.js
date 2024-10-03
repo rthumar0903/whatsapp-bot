@@ -245,7 +245,7 @@ exports.senMessage = async (req, res) => {
             "id",
             agent?.user_id
           );
-          console.log(" - - - - - - -agent users");
+          console.log(" - - - - - - -agent users", agentUser);
           await sendMessageToAgent(
             phoneNumberId,
             agentUser?.phone_number,
