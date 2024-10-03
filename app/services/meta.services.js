@@ -38,7 +38,7 @@ exports.sendLocationMessage = async (phonNoId, userName, phoneNumber) => {
   }
 };
 
-exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
+exports.sendNotServicableMessage = async (text, phonNoId, phoneNumber) => {
   try {
     axios({
       method: "POST",
@@ -53,7 +53,7 @@ exports.sendNotServicableMessage = async (phonNoId, phoneNumber) => {
         type: "text",
         to: phoneNumber,
         text: {
-          body: `Sorry, \nWe are not present in your area yet. And plan to be there soon. Please download our app for future`,
+          body: text,
         },
       },
       headers: {

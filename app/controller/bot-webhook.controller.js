@@ -26,6 +26,8 @@ const MIN_DIST = whatsAppConfig.MIN_DIST;
 
 const { getAddressFromLatLong } = require("../services/address.service.js");
 const { json } = require("body-parser");
+const nonServicableText = `Sorry, \nWe are not present in your area yet. And plan to be there soon. Please download our app for future`;
+
 exports.webHookSetUp = (req, res) => {
   res.status(200).send("hello this is webhook setup");
 };
@@ -89,7 +91,25 @@ exports.senMessage = async (req, res) => {
 
         await sendLocationMessage(phoneNumberId, userName, phoneNumber);
       }
+      if (
+        body_param.entry[0].changes[0].value.messages[0].text &&
+        body_param.entry[0].changes[0].value.messages[0].text.body &&
+        body_param.entry[0].changes[0].value.messages[0].text.body.toLowerCase() ==
+          "Connect with Agent"
+      ) {
+        const userName =
+          body_param.entry[0].changes[0].value?.contacts[0]?.profile?.name;
+        const phoneNumberId =
+          body_param.entry[0].changes[0].value.metadata.phone_number_id;
+        const phoneNumber =
+          body_param.entry[0].changes[0].value.messages[0].from;
 
+        await sendNotServicableMessage(
+          "Your details is shared with agent, agent will call you soon",
+          phoneNumberId,
+          phoneNumber
+        );
+      }
       if (
         body_param.entry[0].changes[0].value.messages[0].location &&
         body_param.entry[0].changes[0].value.messages[0].location["latitude"] &&
@@ -154,7 +174,11 @@ exports.senMessage = async (req, res) => {
                       "Some error occurred while creating the Tutorial.",
                   });
                 if (shop_dist > MIN_DIST) {
-                  await sendNotServicableMessage(phoneNumberId, phoneNumber);
+                  await sendNotServicableMessage(
+                    nonServicableText,
+                    phoneNumberId,
+                    phoneNumber
+                  );
                 } else {
                   await sendServicableMessage(
                     phoneNumberId,
