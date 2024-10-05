@@ -1,4 +1,8 @@
-const { findAgentsDetails, addAgent } = require("../models/agent.model");
+const {
+  findAgentsDetails,
+  addAgent,
+  updateAgent,
+} = require("../models/agent.model");
 const {
   insertRecord,
   checkRecordExists,
@@ -54,6 +58,44 @@ exports.addAgent = async (req, res) => {
     };
     // console.log("user added", userAdded);
     await addAgent(agent, async (err, data) => {
+      if (err)
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while creating the Tutorial.",
+        });
+      else res.status(201).send(data);
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.UpdateAgent = async (req, res) => {
+  try {
+    // const customerDetails = await checkRecordExists("users", "id", id);
+    // const shops = await getRecords("shops");
+    const agentId = req.params?.agentId;
+    const { name, phoneNumber } = req.body;
+    const existentAgent = await checkRecordExists("agent", id, agentId);
+    if (existentAgent === null) {
+      return res.status(404);
+    }
+    const phoneExist = await checkRecordExists(
+      "user",
+      "phone_number",
+      phoneNumber
+    );
+    if (!(phoneExist === null)) {
+      return res.status(400).send({
+        message: "phoneNumber already exist",
+      });
+    }
+    const agent = {
+      name,
+      phone_number: phoneNumber,
+    };
+    // console.log("user added", userAdded);
+    await updateAgent(agent, async (err, data) => {
       if (err)
         res.status(500).send({
           message:

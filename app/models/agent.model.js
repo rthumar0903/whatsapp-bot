@@ -23,3 +23,15 @@ exports.addAgent = (agent, result) => {
     result(null, res);
   });
 };
+
+exports.updateAgent = (agent, result) => {
+  const query = `Update agent SET ?`;
+  sql.query(query, agent, (err, res) => {
+    if (err) {
+      console.error(err);
+      result(err, null);
+      return;
+    }
+    result(null, res);
+  });
+};

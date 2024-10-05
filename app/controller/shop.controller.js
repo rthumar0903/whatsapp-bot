@@ -1,5 +1,6 @@
 const Shop = require("../models/shop.model");
 const { getRecords } = require("../models/utils/sqlFunction");
+const { getLatLong } = require("../services/address.service");
 
 exports.getShops = async (req, res) => {
   try {
@@ -27,6 +28,7 @@ exports.addShops = async (req, res) => {
       closeTime,
       agentId,
     } = req.body;
+
     const shop = new Shop({
       shop_code: shopCode,
       shop_name: shopName,
@@ -41,6 +43,13 @@ exports.addShops = async (req, res) => {
       close_time: closeTime,
       agent_id: agentId,
     });
+    if (shopAddress) {
+      const latlong = await getLatLong(shopAddress);
+      if (latlong?.data?.length > 0) {
+        shop.latitude = latlong?.data?.[0].lat;
+        shop.longitude = latlong?.data?.[0].lon;
+      }
+    }
     await Shop.insertShop(shop, (err, data) => {
       if (err)
         res.status(500).send({

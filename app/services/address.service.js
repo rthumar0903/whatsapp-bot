@@ -17,3 +17,18 @@ exports.getAddressFromLatLong = async (latitude, longitude) => {
     console.log(ex);
   }
 };
+
+exports.getLatLong = async (address) => {
+  try {
+    const response = axios({
+      method: "POST",
+      url: `https://geocode.maps.co/search?q=${address}&api_key=` + MAP_API_KEY,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (ex) {
+    console.log(ex);
+  }
+};
