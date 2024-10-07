@@ -1,5 +1,6 @@
 const Shop = require("../models/shop.model");
-const { getRecords } = require("../models/utils/sqlFunction");
+const { updateShop } = require("../models/shop.model");
+const { getRecords, updateRecord } = require("../models/utils/sqlFunction");
 const { getLatLong } = require("../services/address.service");
 
 exports.getShops = async (req, res) => {
@@ -58,6 +59,58 @@ exports.addShops = async (req, res) => {
         });
       else res.send(data);
     });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.updateShop = async (req, res) => {
+  try {
+    const {
+      shopName,
+      shopAddress,
+      phoneNumber,
+      pinCode,
+      latitude,
+      longitude,
+      serviceTime,
+      isFullTime,
+      openTime,
+      closeTime,
+    } = req?.body;
+    const id = req?.params?.shopId;
+
+    const shop = {};
+
+    if (shopName) shop["shop_name"] = shopName;
+
+    if (shopAddress) shop["shop_address"] = shopAddress;
+
+    if (phoneNumber) shop["phone_number"] = phoneNumber;
+
+    if (pinCode) shop["pincode"] = pinCode;
+
+    // if (latitude) shop["latitude"] = latitude;
+
+    // if (longitude) shop["longitude"] = longitude;
+
+    if (serviceTime) shop["service_time"] = serviceTime;
+
+    if (isFullTime !== undefined) shop["is_full_time"] = isFullTime;
+
+    if (openTime) shop["open_time"] = openTime;
+
+    if (closeTime) shop["close_time"] = closeTime;
+
+    if (shopAddress) {
+      const latlong = await getLatLong(shopAddress);
+      if (latlong?.data?.length > 0) {
+        shop["latitude"] = latlong?.data?.[0].lat;
+        shop["longitude"] = latlong?.data?.[0].lon;
+      }
+    }
+    const result = await updateRecord("shops", shop, "id", id);
+    res.status(204).send();
   } catch (error) {
     console.error(error);
   }

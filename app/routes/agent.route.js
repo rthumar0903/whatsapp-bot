@@ -5,6 +5,7 @@ module.exports = (app) => {
 
   // Create a new User
   router.get("/agents", agents.getAgents);
+  router.get("/agents/:agentId", agents.getAgent);
   router.post("/agents", agents.addAgent);
 
   app.use("/", router);

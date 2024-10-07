@@ -6,6 +6,7 @@ module.exports = (app) => {
   // Create a new User
   router.get("/shops", shops.getShops);
   router.post("/shops", shops.addShops);
+  router.put("/shops/:shopId", shops.updateShop);
 
   app.use("/", router);
 };

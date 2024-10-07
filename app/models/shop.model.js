@@ -38,4 +38,15 @@ Shop.insertShop = (shop, result) => {
   });
 };
 
+exports.updateShop = (id, shop, result) => {
+  const query = "update shops SET ? where id=?";
+  sql.query(query, [shop, id], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    result(null, { id: res.insertId, ...shop });
+  });
+};
 module.exports = Shop;
