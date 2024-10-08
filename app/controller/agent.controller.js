@@ -77,26 +77,29 @@ exports.UpdateAgent = async (req, res) => {
     // const shops = await getRecords("shops");
     const agentId = req.params?.agentId;
     const { name, phoneNumber } = req.body;
-    const existentAgent = await checkRecordExists("agent", id, agentId);
+    const existentAgent = await checkRecordExists("agent", "id", agentId);
     if (existentAgent === null) {
       return res.status(404);
     }
     const phoneExist = await checkRecordExists(
-      "user",
+      "users",
       "phone_number",
       phoneNumber
     );
-    if (!(phoneExist === null)) {
+    if (
+      !(phoneExist?.id === existentAgent?.user_id) &&
+      !(phoneExist === null)
+    ) {
       return res.status(400).send({
         message: "phoneNumber already exist",
       });
     }
-    const agent = {
+    const user = {
       name,
       phone_number: phoneNumber,
     };
     // console.log("user added", userAdded);
-    await updateAgent(agent, async (err, data) => {
+    await updateAgent(user, existentAgent?.user_id, async (err, data) => {
       if (err)
         res.status(500).send({
           message:

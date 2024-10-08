@@ -196,6 +196,7 @@ exports.senMessage = async (req, res) => {
         body_param.entry[0].changes[0].value.messages[0].image &&
         body_param.entry[0].changes[0].value.messages[0].image["id"]
       ) {
+        console.log("image message", JSON.stringify(body_param));
         const phoneNumber =
           body_param.entry[0].changes[0].value.messages[0].from;
         const phoneNumberId =

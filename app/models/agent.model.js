@@ -24,9 +24,9 @@ exports.addAgent = (agent, result) => {
   });
 };
 
-exports.updateAgent = (agent, result) => {
-  const query = `Update agent SET ?`;
-  sql.query(query, agent, (err, res) => {
+exports.updateAgent = (agent, userId, result) => {
+  const query = `Update users SET ? where id=?`;
+  sql.query(query, [agent, userId], (err, res) => {
     if (err) {
       console.error(err);
       result(err, null);
