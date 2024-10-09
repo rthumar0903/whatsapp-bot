@@ -219,3 +219,28 @@ exports.sendOtp = async (otp, phoneNumber) => {
     console.log(ex);
   }
 };
+
+exports.getImage = async () => {
+  try {
+    const URL = `https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=447919264345274&ext=1728406413&hash=ATuQdVWXcUCogy7NZ5g6POdsGoiusbBrBWw3M2ACaO0KKg`;
+    axios({
+      method: "GET",
+      url: URL,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(function (response) {
+        const imageBlob = response.data;
+        const imageObjectURL = URL.createObjectURL(imageBlob);
+        console.log("img url", imageObjectURL);
+        // Set the image URL in the state
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } catch (ex) {
+    console.log(ex);
+  }
+};

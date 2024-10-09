@@ -37,7 +37,6 @@ exports.updateAgent = (agent, userId, result) => {
 };
 
 exports.findAgentDetails = (id, result) => {
-  console.log(id);
   const query = `SELECT u.name,u.phone_number,a.user_id,a.id FROM users u JOIN agent a ON a.user_id = u.id where a.id=?`;
   sql.query(query, id, (err, res) => {
     if (err) {

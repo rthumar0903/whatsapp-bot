@@ -54,7 +54,6 @@ exports.getRecords = (tableName) => {
       if (err) {
         reject(err);
       } else {
-        console.log("shops", results);
         resolve(results.length ? results : null);
       }
     });

@@ -8,6 +8,7 @@ const {
   getUploadAttachmentUrl,
   sendMessageToAgent,
   sendAttachmentMessageToAgent,
+  getImage,
 } = require("../services/meta.services.js");
 const { findMinShopDistance } = require("../services/distance.service.js");
 const userRoles = require("../constants/role.constants.js");
@@ -42,6 +43,14 @@ exports.getMessage = (req, res) => {
     } else {
       res.status(403);
     }
+  }
+};
+
+exports.getImageFromId = async (req, res) => {
+  try {
+    await getImage();
+  } catch (ex) {
+    console.error(ex);
   }
 };
 
@@ -86,7 +95,6 @@ exports.senMessage = async (req, res) => {
                   err.message ||
                   "Some error occurred while creating the Tutorial.",
               });
-            console.log("name and phone number inserted in Hi message", data);
           });
 
         await sendLocationMessage(phoneNumberId, userName, phoneNumber);
@@ -262,7 +270,6 @@ exports.senMessage = async (req, res) => {
             phoneNumber,
             customerAddress
           );
-          console.log("sended = = =  = = =");
           await sendAttachmentMessageToAgent(
             phoneNumberId,
             agentUser?.phone_number,

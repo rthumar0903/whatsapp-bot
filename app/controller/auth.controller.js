@@ -41,8 +41,6 @@ const generateAccessToken = (userId) => {
 };
 
 exports.sendOtp = async (req, res) => {
-  console.log("come");
-
   const { phoneNumber } = req.body;
   try {
     await sendteOtpService(phoneNumber);

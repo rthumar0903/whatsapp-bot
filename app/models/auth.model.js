@@ -11,7 +11,6 @@ exports.insertOtp = (otp, phoneNumber, result) => {
         result(err, null);
         return;
       }
-      console.log("res", res);
       result(null, { id: res.insertId, ...otp });
     }
   );

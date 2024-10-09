@@ -9,6 +9,8 @@ module.exports = (app) => {
 
   router.post("/webhook", user.senMessage);
 
+  router.get("/getImage", user.getImageFromId);
+
   router.get("/customers/:id", customer.getCustomerDetails);
 
   router.get("/customers", customer.getCustomers);
