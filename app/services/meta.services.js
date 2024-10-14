@@ -2,7 +2,7 @@ const whatsAppConfig = require("../config/whatsapp.config.js");
 const token = whatsAppConfig.TOKEN;
 const phonNoId = whatsAppConfig.PHONE_ID;
 // const mytoken = whatsAppConfig.MYTOKEN;
-
+const fs = require("fs");
 const axios = require("axios");
 
 exports.sendLocationMessage = async (phonNoId, userName, phoneNumber) => {
@@ -220,27 +220,62 @@ exports.sendOtp = async (otp, phoneNumber) => {
   }
 };
 
-exports.getImage = async () => {
-  try {
-    const URL = `https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=447919264345274&ext=1728406413&hash=ATuQdVWXcUCogy7NZ5g6POdsGoiusbBrBWw3M2ACaO0KKg`;
-    axios({
-      method: "GET",
-      url: URL,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(function (response) {
-        const imageBlob = response.data;
-        const imageObjectURL = URL.createObjectURL(imageBlob);
-        console.log("img url", imageObjectURL);
-        // Set the image URL in the state
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } catch (ex) {
-    console.log(ex);
-  }
-};
+// exports.getImage = async () => {
+//   try {
+//     const URL = `https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=1206148197308460&ext=1728491571&hash=ATv4stRKzExrOzC-El5jhnehMfrGKZ8NTVIU1vnLv5P34Q`;
+//     axios({
+//       method: "GET",
+//       url: URL,
+
+//       headers: {
+//         "Access-Control-Allow-Origin": "*",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       responseType: "stream", // Stream the image
+//     })
+//       .then(function (response) {
+//         // const imageBlob = response.data;
+//         // console.log(imageBlob);
+//         response.data.pipe(fs.createWriteStream("image.jpg"));
+//         // const imageObjectURL = URL.createObjectURL(imageBlob);
+//         // console.log("img url", imageObjectURL);
+//         // Set the image URL in the state
+//       })
+//       .catch(function (error) {
+//         console.log(error);
+//       });
+//   } catch (ex) {
+//     console.log(ex);
+//   }
+// };
+
+// exports.getImage = async (res) => {
+//   try {
+//     const URL =
+//       "https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=1206148197308460&ext=1728493701&hash=ATuY_vtQO40JeBq6u0xeRLg8-fyUVswt9xJqVLKk6nBVIw";
+//     const mediaMimeType = "image/jpeg";
+//     const response = await axios.get(URL, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": mediaMimeType,
+//       },
+//       responseType: "arraybuffer", // This is important for binary data
+//     });
+//     if (mediaMimeType.startsWith("image/")) {
+//       const filename = "temp";
+//       file_extension = filename + "." + mediaMimeType.split("/")[1];
+//       typeoffile = mediaMimeType.split("/")[0];
+
+//       somedata = Buffer.from(response.data, "binary");
+
+//       await fs.writeFileSync(
+//         file_extension,
+//         Buffer.from(response.data, "binary")
+//       );
+//       res.status(200).send();
+//       console.log(`Media saved to ${file_extension} successfully.`);
+//     }
+//   } catch (ex) {
+//     console.log(ex);
+//   }
+// };

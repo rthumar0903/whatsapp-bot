@@ -48,7 +48,7 @@ exports.getMessage = (req, res) => {
 
 exports.getImageFromId = async (req, res) => {
   try {
-    await getImage();
+    await getImage(req, res);
   } catch (ex) {
     console.error(ex);
   }

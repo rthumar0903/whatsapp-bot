@@ -10,7 +10,7 @@ var corsOptions = {
   origin: "http://localhost:3000",
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json()); /* bodyParser.json() is deprecated */
 
