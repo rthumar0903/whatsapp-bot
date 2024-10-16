@@ -234,18 +234,27 @@ exports.senMessage = async (req, res) => {
                   err.message ||
                   "Some error occurred while creating the Tutorial.",
               });
-            const file = {
-              order_id: data?.id,
-              created_at: new Date(),
-              media_id: imageId,
-            };
-            await insertFile(file, async (err, data) => {
+            await getImage(imageId, async (err, imgRes) => {
               if (err)
-                res.status(500).send({
+                imgRes.status(500).send({
                   message:
                     err.message ||
                     "Some error occurred while creating the Tutorial.",
                 });
+              console.log("img - - - -", data);
+              const file = {
+                order_id: data?.id,
+                created_at: new Date(),
+                media_id: imgRes,
+              };
+              await insertFile(file, async (err, data) => {
+                if (err)
+                  res.status(500).send({
+                    message:
+                      err.message ||
+                      "Some error occurred while creating the Tutorial.",
+                  });
+              });
             });
           });
 

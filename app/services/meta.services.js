@@ -1,4 +1,5 @@
 const whatsAppConfig = require("../config/whatsapp.config.js");
+const { cloudinary } = require("../config/cloudinary.config");
 const token = whatsAppConfig.TOKEN;
 const phonNoId = whatsAppConfig.PHONE_ID;
 // const mytoken = whatsAppConfig.MYTOKEN;
@@ -248,34 +249,61 @@ exports.sendOtp = async (otp, phoneNumber) => {
 //     console.log(ex);
 //   }
 // };
+const getImageUrl = async (imageId) => {
+  try {
+    const URL = "https://graph.facebook.com/v18.0/" + imageId;
+    const response = await axios.get(URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response?.status === 200) return response?.data;
+  } catch (ex) {
+    console.log(ex);
+  }
+};
+exports.getImage = async (imageId, res) => {
+  try {
+    const urlRes = await getImageUrl(imageId);
+    const URL = urlRes?.url;
+    const mediaMimeType = "image/jpeg";
+    const response = await axios.get(URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": mediaMimeType,
+      },
+      responseType: "arraybuffer", // This is important for binary data
+    });
 
-// exports.getImage = async (res) => {
-//   try {
-//     const URL =
-//       "https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=1206148197308460&ext=1728493701&hash=ATuY_vtQO40JeBq6u0xeRLg8-fyUVswt9xJqVLKk6nBVIw";
-//     const mediaMimeType = "image/jpeg";
-//     const response = await axios.get(URL, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": mediaMimeType,
-//       },
-//       responseType: "arraybuffer", // This is important for binary data
-//     });
-//     if (mediaMimeType.startsWith("image/")) {
-//       const filename = "temp";
-//       file_extension = filename + "." + mediaMimeType.split("/")[1];
-//       typeoffile = mediaMimeType.split("/")[0];
+    if (mediaMimeType.startsWith("image/")) {
+      const filename = "temp";
+      file_extension = filename + "." + mediaMimeType.split("/")[1];
+      typeoffile = mediaMimeType.split("/")[0];
 
-//       somedata = Buffer.from(response.data, "binary");
+      somedata = Buffer.from(response.data, "binary");
+      await fs.writeFileSync(
+        file_extension,
+        Buffer.from(response.data, "binary")
+      );
+      // res.status(200).send();
+      console.log(`Media saved to ${file_extension} successfully.`);
 
-//       await fs.writeFileSync(
-//         file_extension,
-//         Buffer.from(response.data, "binary")
-//       );
-//       res.status(200).send();
-//       console.log(`Media saved to ${file_extension} successfully.`);
-//     }
-//   } catch (ex) {
-//     console.log(ex);
-//   }
-// };
+      const base64String = somedata.toString("base64");
+
+      cloudinary.uploader.upload(
+        `data:image/jpeg;base64,${base64String}`, // Adjust MIME type if needed
+        { folder: "assets" }, // Optional: upload to a specific folder
+        function (error, result) {
+          if (error) {
+            res.status(500);
+          } else {
+            return res(null, result?.url);
+            // console.log("Upload Result:", result);
+          }
+        }
+      );
+    }
+  } catch (ex) {
+    console.log(ex);
+  }
+};

@@ -1,5 +1,7 @@
 const express = require("express");
 require("dotenv").config();
+const path = require("path");
+
 // const bodyParser = require("body-parser"); /* deprecated */
 const cors = require("cors");
 // const body_parser = require("body-parser");
@@ -13,6 +15,8 @@ var corsOptions = {
 app.use(cors());
 
 app.use(express.json()); /* bodyParser.json() is deprecated */
+
+app.use("/assets", express.static(path.join("app/assets")));
 
 app.use(
   express.urlencoded({ extended: true })

@@ -56,9 +56,22 @@ exports.login = async (req, res) => {
   try {
     const isAuthorize = await login(phoneNumber, otp);
     const user = await checkRecordExists("users", "phone_number", phoneNumber);
-    if (isAuthorize) res.status(200).json({ data: user });
-    else res.sendStatus(403);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+
+    if (user === null) res.status(404);
+    if (!isAuthorize) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      "your_jwt_secret",
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.json({ data: user, token });
+  } catch (ex) {
+    console.log(ex);
+    return res.status(500).json({ error: ex });
   }
 };

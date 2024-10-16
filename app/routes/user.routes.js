@@ -1,3 +1,5 @@
+const { authorize } = require("../services/auth.service");
+
 module.exports = (app) => {
   const user = require("../controller/bot-webhook.controller");
   const customer = require("../controller/customer.controller");
@@ -13,7 +15,11 @@ module.exports = (app) => {
 
   router.get("/customers/:id", customer.getCustomerDetails);
 
-  router.get("/customers", customer.getCustomers);
+  router.get(
+    "/customers",
+    authorize(["Admin", "Agent"]),
+    customer.getCustomers
+  );
 
   app.use("/", router);
 };
