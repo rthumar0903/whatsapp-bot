@@ -56,8 +56,7 @@ exports.getImageFromId = async (req, res) => {
 
 exports.senMessage = async (req, res) => {
   let body_param = req.body;
-  if (body_param) {
-    // if (body_param.object) {
+  if (body_param.object) {
     if (
       body_param.entry &&
       body_param.entry[0].changes &&
