@@ -55,8 +55,8 @@ exports.getImageFromId = async (req, res) => {
 };
 
 exports.senMessage = async (req, res) => {
-  console.log("here====================");
   let body_param = req.body;
+  console.log("here====================", JSON.stringify(body_param));
   if (body_param.object) {
     if (
       body_param.entry &&
@@ -76,6 +76,7 @@ exports.senMessage = async (req, res) => {
           body_param.entry[0].changes[0].value.metadata.phone_number_id;
         const phoneNumber =
           body_param.entry[0].changes[0].value.messages[0].from;
+        console.log("details====================", userName, phoneNumber);
 
         const user = new User({
           name: userName,
