@@ -39,7 +39,7 @@ exports.getMessage = (req, res) => {
   let token = req.query["hub.verify_token"];
   if (mode && token) {
     if (mode === "subscribe" && token === mytoken) {
-      res.send(challange, 200);
+      res.status(200).send(challange);
     } else {
       res.status(403);
     }
